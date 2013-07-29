@@ -1,0 +1,14 @@
+Package: SigFuge
+Type: Package
+Title: SigFuge
+Version: 0.99.2
+Date: 2013-07-04
+Author: Patrick Kimes, Christopher Cabanski
+Maintainer: Patrick Kimes <pkimes@live.unc.edu>
+Description: Algorithm for testing significance of clustering in RNA-seq data.
+License: GPL-3
+biocViews: Clustering, Visualization, RNAseq
+Imports: ggplot2, matlab, reshape, sigclust
+Depends: R (>= 2.15.2), GenomicRanges
+Suggests: org.Hs.eg.db, prebsdata, Rsamtools,
+        TxDb.Hsapiens.UCSC.hg19.knownGene

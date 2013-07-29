@@ -1,0 +1,6 @@
+export(SFfigure, SFlabels, SFnormalize, SFpval)
+import(GenomicRanges)
+import(ggplot2)
+import(sigclust)
+importFrom(matlab,flipud)
+importFrom(reshape,melt.data.frame)
