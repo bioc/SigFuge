@@ -9,6 +9,6 @@ Description: Algorithm for testing significance of clustering in RNA-seq data.
 License: GPL-3
 biocViews: Clustering, Visualization, RNAseq
 Imports: ggplot2, matlab, reshape, sigclust
-Depends: R (>= 2.15.2), GenomicRanges
+Depends: R (>= 3.0.2), GenomicRanges
 Suggests: org.Hs.eg.db, prebsdata, Rsamtools,
         TxDb.Hsapiens.UCSC.hg19.knownGene, BiocStyle
