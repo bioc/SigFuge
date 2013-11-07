@@ -3,9 +3,10 @@
 \title{Plot expression as curves}
 \usage{
   SFfigure(data, locusname, annot = c(), flip.fig = 1,
-    label.exon = 1, print.n = 1, data.labels = 0,
-    label.colors = c(), flag = 1, lplots = 2,
-    savestr = c(), titlestr = c(), pval = 1)
+           label.exon = 1, print.n = 1, data.labels = 0,
+           label.colors = c(), flag = 1, lplots = 2,
+           log10 = 1, summary.type = "median",
+           savestr = c(), titlestr = c(), pval = 1)
 }
 \arguments{
   \item{data}{a \eqn{d \times n}{d x n} matrix or
@@ -43,9 +44,9 @@
 
   \item{flag}{a \eqn{n \times 1}{n x 1} logical vector of
   samples flagged as low expression. If \code{flag == 1},
-  default low expression cutoffs are used. If \code{flag ==
-  0}, no samples are flagged as low expression (equivalent
-  to setting flag = zeros(n, 1)).}
+  default low expression cutoffs are used. If \code{flag == 0},
+  no samples are flagged as low expression (equivalent to 
+  setting flag = rep(0, n)).}
 
   \item{lplots}{a specification of which figures to output
   \itemize{ \item \code{1}: curves in single
@@ -55,6 +56,13 @@
   \eqn{n} panels, colored by cluster (single sample per panel)
   \item \code{5}: cluster medians in single panel, colored by 
   cluster }}
+
+  \item{log10}{an indicator whether the y-axis (read depth)
+  should be log10 transformed. Default is to plot on log-scale.}
+
+  \item{summary.type}{a character string specifying which
+  summary statistic should be used when plotting clusters in
+  lplots == 2, 3, and 5.  Options: "median" (default) or "mean".}
 
   \item{savestr}{a string specifying the file name for
   resulting figures. Extensions can also be specified in
@@ -114,4 +122,3 @@ mySFs$plot1
 \author{
   Patrick Kimes <pkimes@live.unc.edu>
 }
-
