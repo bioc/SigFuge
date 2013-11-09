@@ -1,6 +1,9 @@
 SFpval <- function(data, normalize = 1, flag = 1) {
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> change indents to 2 spaces
   # normalize data
   if (normalize == 1) {
     data <- SFnormalize(data, flag)$data.norm
@@ -12,6 +15,7 @@ SFpval <- function(data, normalize = 1, flag = 1) {
       # nrep=1 appears to produre inconsistent results
 
   return(sc)
+<<<<<<< HEAD
 =======
     # normalize data
     if (normalize == 1) {
@@ -25,5 +29,7 @@ SFpval <- function(data, normalize = 1, flag = 1) {
   
     return(sc)
 >>>>>>> Correct orientation of data input to sigclust()
+=======
+>>>>>>> change indents to 2 spaces
 
 }
