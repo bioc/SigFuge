@@ -21,11 +21,15 @@ BiocStyle::latex()
 \tableofcontents
 
 \section{Summary}
+<<<<<<< HEAD
 <<<<<<< HEAD:vignettes/SigFuge.Rnw
 \texttt{SigFuge} is a tool that takes as input RNA-seq read depth (coverage) for multiple samples across a genomic locus (gene/transcript) and (1) clusters samples using the coverage data, (2) assesses significance of the clusters using SigClust and (3) visualizes transcript coverage along genomic coordinates.  This document provides a tutorial on how to use the functions of the \Biocpkg{SigFuge} package. \textbf{THERE HAVE BEEN SEVERAL CRITICAL UPDATES TO THE SigFuge PACKAGE. MAKE SURE THAT YOU HAVE DOWNLOADED AND ARE RUNNING SigFuge VERSION 1.1.2 OR GREATER TO ACHIEVE ALL FUNCTIONALITY DESCRIBED IN THIS TUTORIAL.}
 =======
 \texttt{SigFuge} is a tool that takes as input RNA-seq read depth (coverage) for multiple samples across a genomic locus (gene/transcript) and (1) clusters samples using the coverage data, (2) assesses significance of the clusters using SigClust and (3) visualizes transcript coverage along genomic coordinates.  This document provides a tutorial on how to use the functions of the \Biocpkg{SigFuge} package. \textbf{THERE HAVE BEEN SEVERAL CRITICAL UPDATES TO THE SigFuge PACKAGE. MAKE SURE THAT YOU HAVE DOWNLOADED AND ARE RUNNING SigFuge VERSION 1.0.1 OR GREATER TO ACHIEVE ALL FUNCTIONALITY DESCRIBED IN THIS TUTORIAL.}
 >>>>>>> change .Rnw path to vignette/, update vignette to use BiocStyle:vignettes/SigFuge.Rnw
+=======
+\texttt{SigFuge} is a tool that takes as input RNA-seq read depth (coverage) for multiple samples across a genomic locus (gene/transcript) and (1) clusters samples using the coverage data, (2) assesses significance of the clusters using SigClust and (3) visualizes transcript coverage along genomic coordinates.  This document provides a tutorial on how to use the functions of the \Biocpkg{SigFuge} package. \textbf{THERE HAVE BEEN SEVERAL CRITICAL UPDATES TO THE SigFuge PACKAGE. MAKE SURE THAT YOU HAVE DOWNLOADED AND ARE RUNNING SigFuge VERSION 1.1.2 OR GREATER TO ACHIEVE ALL FUNCTIONALITY DESCRIBED IN THIS TUTORIAL.}
+>>>>>>> fix version number in text
 
 \section{Introduction}
 Frequently, one of the main goals of an RNA-seq experiment is to identify genes that are differentially expressed (DE) between two conditions, e.g. tumor and matched normal samples.  In this setting where the contrasting groups of samples are known, several existing DE tools, including Bioconductor packages \Biocpkg{DESeq}~\cite{DESeq} and \Biocpkg{edgeR}~\cite{edgeR}, can be used to identify the set of DE genes.
