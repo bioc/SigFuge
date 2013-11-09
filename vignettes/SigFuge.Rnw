@@ -142,11 +142,11 @@ data(geneDepth)
 @
 
 \subsection{\Rfunction{SFfigure}}
-\Rfunction{SFfigure} is a comprehensive function that performs 4 main tasks: (1) normalization of the data matrix, (2) unsupervised clustering on the normalized values, (3) $p$-value calculation for significance of clustering, and (4) plotting of the data curves.  The following code uses the default normalization and clustering procedures to produce 3 plots (Figures~\ref{fig1}-\ref{fig3}).  These plots will be saved in the working directory as \file{CDKN2A\_1.pdf}, \file{CDKN2A\_2.pdf}, and \file{CDKN2A\_3.pdf}.  To speed up calculations, we will only consider the first 50 samples.
+\Rfunction{SFfigure} is a comprehensive function that performs 4 main tasks: (1) normalization of the data matrix, (2) unsupervised clustering on the normalized values, (3) $p$-value calculation for significance of clustering, and (4) plotting of the data curves.  The following code uses the default normalization and clustering procedures to produce 3 plots (Figures~\ref{fig1}-\ref{fig3}).  These plots will be saved in the working directory as \file{CDKN2A\_1.pdf}, \file{CDKN2A\_2.pdf}, and \file{CDKN2A\_3.pdf}.  To speed up calculations, we will only consider a subset of 50 samples.
 
 <<fig=FALSE>>=
 genename <- "CDKN2A"
-mdata <- geneDepth[,1:50]
+mdata <- geneDepth[,101:150]
 SFfigure(data=mdata, locusname=genename,
            annot=geneAnnot, lplots=1:3, savestr=genename, 
            titlestr="CDKN2A locus, LUSC samples")
