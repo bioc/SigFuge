@@ -1,39 +1,50 @@
 %\VignetteIndexEntry{SigFuge Tutorial}
 %\VignettePackage{SigFuge}
+
 \documentclass{article}
+
+<<style, eval=TRUE, echo=FALSE, results=tex>>=
+BiocStyle::latex()
+@
+
 \usepackage{graphicx}
+
+\title{SigFuge (Tutorial)}
+\author{Patrick K. Kimes, Christopher R. Cabanski}
+
 \begin{document}
 \SweaveOpts{concordance=TRUE}
 \SweaveOpts{keep.source=TRUE}
-\title{SigFuge (Tutorial)}
-\author{Patrick K. Kimes, Christopher R. Cabanski}
+
 \maketitle
 
+\tableofcontents
 
 \section{Summary}
-\texttt{SigFuge} is a tool that takes as input RNA-seq read depth (coverage) for multiple samples across a genomic locus (gene/transcript) and (1) clusters samples using the coverage data, (2) assesses significance of the clusters using SigClust and (3) visualizes transcript coverage along genomic coordinates.  This document provides a tutorial on how to use the functions of the \Biocpkg{SigFuge} package. \textbf{THERE HAVE BEEN SEVERAL CRITICAL UPDATES TO THE SigFuge PACKAGE. MAKE SURE THAT YOU HAVE DOWNLOADED AND ARE RUNNING SigFuge VERSION 1.0.1 OR GREATER TO ACHIEVE ALL FUNCTIONALITY DESCRIBED IN THIS TUTORIAL.}
+\texttt{SigFuge} is a tool that takes as input RNA-seq read depth (coverage) for multiple samples across a genomic locus (gene/transcript) and (1) clusters samples using the coverage data, (2) assesses significance of the clusters using SigClust and (3) visualizes transcript coverage along genomic coordinates.  This document provides a tutorial on how to use the functions of the \Biocpkg{SigFuge} package. \textbf{THERE HAVE BEEN SEVERAL CRITICAL UPDATES TO THE SigFuge PACKAGE. MAKE SURE THAT YOU HAVE DOWNLOADED AND ARE RUNNING SigFuge VERSION 1.0.2 OR GREATER TO ACHIEVE ALL FUNCTIONALITY DESCRIBED IN THIS TUTORIAL.}
 
 \section{Introduction}
-Frequently, one of the main goals of an RNA-seq experiment is to identify genes that are differentially expressed (DE) between two conditions, e.g. tumor and matched normal samples.  In this setting where the contrasting groups of samples are known, several existing DE tools, including Bioconductor packages \texttt{DESeq}~\cite{DESeq} and \texttt{edgeR}~\cite{edgeR}, can be used to identify the set of DE genes.
+Frequently, one of the main goals of an RNA-seq experiment is to identify genes that are differentially expressed (DE) between two conditions, e.g. tumor and matched normal samples.  In this setting where the contrasting groups of samples are known, several existing DE tools, including Bioconductor packages \Biocpkg{DESeq}~\cite{DESeq} and \Biocpkg{edgeR}~\cite{edgeR}, can be used to identify the set of DE genes.
 
 \texttt{SigFuge} is for expolartory analysis in RNA-seq experiments not designed to compare two pre-defined conditions.  For example, several studies sequence multiple tumor samples with few, if any, matched normals.  These studies are better suited for identifying subtypes with similar gene expression patterns using unsupervised clustering.  Although many previous studies have performed unsupervised clustering using gene expression values across many genes, here we focus on clustering samples using per-base expression levels (coverage) across one gene locus at a time.  This allows us to identify genes exhibiting different expression patterns across the gene transcript, such as alternative splicing or gene fusions, that may be missed when summarizing gene expression to one value.  Our focus is on identifying genes that could each individually stratify the samples into different clinically important subgroups.
 
-\texttt{SigFuge} is a tool for identifying genes with statistically significant clusters. For each gene, \texttt{SigFuge} treats each sample as a curve where RNA-seq read depth (coverage) is a function of genomic position.  See Figure~\ref{fig1} for an example of multiple samples visualized as curves across the \textit{CDKN2A} locus.  \texttt{SigFuge} clusters samples based on the shape of these expression curves. The significance of clustering at each locus is quantified by a $p$-value calculated using \texttt{SigClust}~\cite{sigclust}.  The \texttt{SigClust} method formulates the question of statistical significance in clustering as a hypothesis test. The null hypothesis of \texttt{SigClust} is that the data are from a single Gaussian distribution.  The significance of a given clustering is measured by the strength of clustering relative to an appropriate simulated null distribution.  As the $p$-value calculation depends on simulation, results will vary slightly between implementations even for the same data matrix.  \texttt{SigFuge} output for each locus includes a \texttt{SigClust} $p$-value and corresponding visualizations of expression clusters along the locus. 
+\texttt{SigFuge} is a tool for identifying genes with statistically significant clusters. For each gene, \texttt{SigFuge} treats each sample as a curve where RNA-seq read depth (coverage) is a function of genomic position.  See Figure~\ref{fig1} for an example of multiple samples visualized as curves across the \textit{CDKN2A} locus.  \texttt{SigFuge} clusters samples based on the shape of these expression curves. The significance of clustering at each locus is quantified by a $p$-value calculated using \CRANpkg{SigClust}~\cite{sigclust}.  The \texttt{SigClust} method formulates the question of statistical significance in clustering as a hypothesis test. The null hypothesis of \texttt{SigClust} is that the data are from a single Gaussian distribution.  The significance of a given clustering is measured by the strength of clustering relative to an appropriate simulated null distribution.  As the $p$-value calculation depends on simulation, results will vary slightly between implementations even for the same data matrix.  \texttt{SigFuge} output for each locus includes a \texttt{SigClust} $p$-value and corresponding visualizations of expression clusters along the locus. 
 
 Visualization of RNA-seq transcript coverage is an important aspect of any study.  The plotting functions that we present here, which can be used independently of the \texttt{SigFuge} clustering results, show the expression level at the per-base resolution across a gene.  Treating these expression profiles as curves allows users to visualize the expression of multiple samples in the same plot.  
 
 This tutorial is split into two parts.  The first part (Section 3) provides examples for loading the data in the appropriate format.  The second part (Section 4) provides a fully worked case study including normalization, clustering, significance testing and plotting.
 
 
-\subsection{Citation} For a more in depth discussion of clustering per-base expression profiles, see our manuscript describing the \texttt{SigFuge} algorithm in further detail.  Please try to cite the following article when you publish results obtained using the software.
+\subsection{Citation} 
+For a more in depth discussion of clustering per-base expression profiles, see our manuscript describing the \texttt{SigFuge} algorithm in further detail.  Please try to cite the following article when you publish results obtained using the software.
 \begin{quote}
 Kimes, P., Cabanski, C., Wilkerson, M., Johnson, A., Makowski, L., Maher, C., Liu, Y., Perou, C., Marron, J.S., Hayes, D.N. SigFuge: unsupervised exploration of transcriptional alterations in RNA-Seq data. \textit{In preparation}.
 \end{quote}
 
 \section{Importing data}
-Two objects are needed to run \texttt{SigFuge}: (1) a \texttt{GRanges} object or similar \texttt{data.frame} containing information about the locus (gene) of interest and (2) a data matrix of coverage for each sample at each base (position) across the locus. The \texttt{GRanges} object is only used to plot the exon boundaries, so it may be omitted if only calcualting \texttt{SigFuge} $p$-values.
+Two objects are needed to run \texttt{SigFuge}: (1) a \Rclass{GRanges} object or similar \Rclass{data.frame} containing information about the locus (gene) of interest and (2) a data matrix of coverage for each sample at each base (position) across the locus. The \Rclass{GRanges} object is only used to plot the exon boundaries, so it may be omitted if only calcualting \texttt{SigFuge} $p$-values.
 
-There are two ways to create a \texttt{GRanges} object.  The first way is to manually input the start and end positions of exons, the chromosome, and the strand orientation.  If a gene has mutliple isoforms with overlapping exons, it is advised to take the union of all isoform models in order to detect possible alternative splicing.  Below is an example for manually creating a \texttt{GRanges} object containing annotation data for the \textit{CDKN2A} locus.
+There are two ways to create a \Rclass{GRanges} object.  The first way is to manually input the start and end positions of exons, the chromosome, and the strand orientation.  If a gene has mutliple isoforms with overlapping exons, it is advised to take the union of all isoform models in order to detect possible alternative splicing.  Below is an example for manually creating a \Rclass{GRanges} object containing annotation data for the \textit{CDKN2A} locus.
 
 <<>>=
 library(SigFuge)
@@ -45,7 +56,7 @@ geneAnnot <- GRanges(seqnames=Rle("chr9", 5),
 geneAnnot
 @
 
-The second way to create a \texttt{GRanges} object is to extract the annotation information from an appropriate \texttt{R} package database.  Below shows how to extract gene annotation data from the set of UCSC known genes.  Notice that exons 4 and 5 are overlapping, so we use the \texttt{reduce()} function to merge these exons.
+The second way to create a \Rclass{GRanges} object is to extract the annotation information from an appropriate \R{} package database.  Below shows how to extract gene annotation data from the set of UCSC known genes.  Notice that exons 4 and 5 are overlapping, so we use the \Rfunction{reduce} function to merge these exons.
 
 <<>>=
 library(org.Hs.eg.db)
@@ -62,7 +73,7 @@ geneAnnot <- reduce(geneAnnot)
 geneAnnot
 @
 
-Now that we have the gene annotation, the next step is to construct the data matrix.  For each locus, a $d$-by-$n$ coverage matrix is required as input, where $d$ is the locus length and $n$ is the sample size.  Each column corresponds to a sample and each row to the coverage (number of overlapping reads) at each base.  We assume that the sequencing data has been aligned to a reference genome and the output is a sorted and indexed BAM file~\cite{samtools}.  To demonstrate how to extract coverage data from a list of BAM files, we will use the example BAM files contained in the \texttt{prebsdata} package (see~\cite{prebsdata} for the original data source).  First, we load, sort and index the BAM files for each sample.  We also create a \texttt{GRanges} object corresponding to the exons of gene DPM1 located on chromosome 20.
+Now that we have the gene annotation, the next step is to construct the data matrix.  For each locus, a $d$-by-$n$ coverage matrix is required as input, where $d$ is the locus length and $n$ is the sample size.  Each column corresponds to a sample and each row to the coverage (number of overlapping reads) at each base.  We assume that the sequencing data has been aligned to a reference genome and the output is a sorted and indexed BAM file~\cite{samtools}.  To demonstrate how to extract coverage data from a list of BAM files, we will use the example BAM files contained in the \Biocexptpkg{prebsdata} package (see~\cite{prebsdata} for the original data source).  First, we load, sort and index the BAM files for each sample.  We also create a \Rclass{GRanges} object corresponding to the exons of gene DPM1 located on chromosome 20.
 
 <<results=hide>>=
 library(Rsamtools)
@@ -88,7 +99,7 @@ indexBam(sorted2)
 bam_files <- c(sorted1, sorted2)
 @
 
-Next, we use the \texttt{GRanges} object to generate a matrix of per-base coverage. To do this, we first create a function to extract coverage, \texttt{calcInfo}.
+Next, we use the \Rclass{GRanges} object to generate a matrix of per-base coverage. To do this, we first create a function to extract coverage, \Rfunction{calcInfo}.
 
 <<>>=
 calcInfo <- function(x) { 
@@ -111,23 +122,23 @@ geneDepth[500:505,]
 
 Depending on the number of samples, the above method may take several minutes per gene to create the coverage matrix.  
 
-It is important to note that the \texttt{GRanges} object is only used to define properties of the \texttt{SigFuge} figures and does not affect any of the analysis. Most notably, the locus information will not be used to parse the coverage matrix. As such, the matrix should only contain the exonic regions of interest and the matrix dimension $d$ should equal the total length of the exons specified in the \texttt{GRanges} object.
+It is important to note that the \Rclass{GRanges} object is only used to define properties of the \texttt{SigFuge} figures and does not affect any of the analysis. Most notably, the locus information will not be used to parse the coverage matrix. As such, the matrix should only contain the exonic regions of interest and the matrix dimension $d$ should equal the total length of the exons specified in the \Rclass{GRanges} object.
 
 
 \section{\texttt{SigFuge} Case Study}
-This section gives a fully worked case study.  We will analyze a subset of 179 lung squamous cell tumor samples sequenced as part of the Cancer Genome Atlas~\cite{TCGA}.  We will restrict attention to the \textit{CDKN2A} locus.  For this example, we skip the data retrieval step and apply \texttt{SigFuge} to a depth count matrix included with the package.  \texttt{geneDepth} is a data matrix of coverage with rows corresponding to genomic positions and columns to samples, and \texttt{geneAnnot} is a \texttt{GRanges} object containing annotation information about the \textit{CDKN2A} locus.
+This section gives a fully worked case study.  We will analyze a subset of 179 lung squamous cell tumor samples sequenced as part of the Cancer Genome Atlas~\cite{TCGA}.  We will restrict attention to the \textit{CDKN2A} locus.  For this example, we skip the data retrieval step and apply \texttt{SigFuge} to a depth count matrix included with the package.  \Robject{geneDepth} is a data matrix of coverage with rows corresponding to genomic positions and columns to samples, and \Robject{geneAnnot} is a \Rclass{GRanges} object containing annotation information about the \textit{CDKN2A} locus.
 
 <<>>=
 data(geneAnnot)
 data(geneDepth)
 @
 
-\subsection{\texttt{SFfigure}}
-\texttt{SFfigure} is a comprehensive function that performs 4 main tasks: (1) normalization of the data matrix, (2) unsupervised clustering on the normalized values, (3) $p$-value calculation for significance of clustering, and (4) plotting of the data curves.  The following code uses the default normalization and clustering procedures to produce 3 plots (Figures~\ref{fig1}-\ref{fig3}).  These plots will be saved in the working directory as \texttt{CDKN2A\_1.pdf}, \texttt{CDKN2A\_2.pdf}, and \texttt{CDKN2A\_3.pdf}.  To speed up calculations, we will only consider the first 50 samples.
+\subsection{\Rfunction{SFfigure}}
+\Rfunction{SFfigure} is a comprehensive function that performs 4 main tasks: (1) normalization of the data matrix, (2) unsupervised clustering on the normalized values, (3) $p$-value calculation for significance of clustering, and (4) plotting of the data curves.  The following code uses the default normalization and clustering procedures to produce 3 plots (Figures~\ref{fig1}-\ref{fig3}).  These plots will be saved in the working directory as \file{CDKN2A\_1.pdf}, \file{CDKN2A\_2.pdf}, and \file{CDKN2A\_3.pdf}.  To speed up calculations, we will only consider a subset of 50 samples.
 
 <<fig=FALSE>>=
 genename <- "CDKN2A"
-mdata <- geneDepth[,1:50]
+mdata <- geneDepth[,101:150]
 SFfigure(data=mdata, locusname=genename,
            annot=geneAnnot, lplots=1:3, savestr=genename, 
            titlestr="CDKN2A locus, LUSC samples")
@@ -137,17 +148,17 @@ SFfigure(data=mdata, locusname=genename,
   \begin{center}
      \includegraphics[width=0.8\textwidth]{CDKN2A_1.pdf}
 	 \caption{\label{fig1}%
-      Graphical output from \texttt{SFfigure} for \texttt{lplots = 1}.  Each curve represents the expression level of one sample across the \textit{CDKN2A} locus.  The curves are colored using default colors.}
+      Graphical output from \Rfunction{SFfigure} for \Rcode{lplots = 1}.  Each curve represents the expression level of one sample across the \textit{CDKN2A} locus.  The curves are colored using default colors.}
   \end{center}
 \end{figure}
 
-Figure~\ref{fig1} shows the raw coverage curves across the \textit{CDKN2A} locus, produced by setting \texttt{lplots = 1}.  The x-axis shows genomic position, where different exons are colored using alternating colors (introns are not included).  The y-axis shows coverage on the $\log_{10}$ scale.  Each curve corresponds to a distinct sample (50 curves are overlaid, one for each sample).  The \texttt{SigClust} $p$-value is reported in the title.  There are only two clear clusters visible in Figure~\ref{fig1}: a low expression class and a high expression class.  However, the significant $p$-value indicates that after filtering out samples with low expression, the high expression samples can be further split into two distinct clusters.  Although these clusters are difficult to see in Figure~\ref{fig1}, they are easily observed in Figures~\ref{fig2} and~\ref{fig3}.
+Figure~\ref{fig1} shows the raw coverage curves across the \textit{CDKN2A} locus, produced by setting \Rcode{lplots = 1}.  The x-axis shows genomic position, where different exons are colored using alternating colors (introns are not included).  The y-axis shows coverage on the $\log_{10}$ scale.  Each curve corresponds to a distinct sample (50 curves are overlaid, one for each sample).  The \texttt{SigClust} $p$-value is reported in the title.  There are only two clear clusters visible in Figure~\ref{fig1}: a low expression class and a high expression class.  However, the significant $p$-value indicates that after filtering out samples with low expression, the high expression samples can be further split into two distinct clusters.  Although these clusters are difficult to see in Figure~\ref{fig1}, they are easily observed in Figures~\ref{fig2} and~\ref{fig3}.
   
 \begin{figure}[tb]
   \begin{center}
      \includegraphics[width=0.8\textwidth]{CDKN2A_2.pdf}
 	 \caption{\label{fig2}%
-      Graphical output from \texttt{SFfigure} for \texttt{lplots = 2}.  The curves are colored according to class label.  The red curves represent a low expression class.  There is a large difference in expression of the second exon between the blue and green curves.  This difference is reflected in the highly significant $p$-value.}
+      Graphical output from \Rfunction{SFfigure} for \Rcode{lplots = 2}.  The curves are colored according to class label.  The red curves represent a low expression class.  There is a large difference in expression of the second exon between the blue and green curves.  This difference is reflected in the highly significant $p$-value.}
   \end{center}
 \end{figure}
 
@@ -159,11 +170,11 @@ Instead of overlaying all curves in a single panel, Figure~\ref{fig3} plots each
   \begin{center}
      \includegraphics[width=1.0\textwidth]{CDKN2A_3.pdf}
 	 \caption{\label{fig3}%
-      Graphical output from \texttt{SFfigure} for \texttt{lplots = 3}.}
+      Graphical output from \Rfunction{SFfigure} for \Rcode{lplots = 3}.}
   \end{center}
 \end{figure}
 
-Although not present in this example, occasionally there will be an outlier sample that is of interest.  Using \texttt{SFfigure} with the option \texttt{lplots = 4} produces a series of plots, where each plot shows one individual curve colored by its class label.  The column names of the data matrix are assumed to be the sample IDs and reported at the top of each plot.  This makes it easy to identify the outlier sample(s).
+Although not present in this example, occasionally there will be an outlier sample that is of interest.  Using \Rfunction{SFfigure} with the option \Rcode{lplots = 4} produces a series of plots, where each plot shows one individual curve colored by its class label.  The column names of the data matrix are assumed to be the sample IDs and reported at the top of each plot.  This makes it easy to identify the outlier sample(s).
 
 <<fig=FALSE,eval=false>>=
 genename <- "CDKN2A"
@@ -172,18 +183,18 @@ SFfigure(data=mdata, locusname=genename,
            titlestr="CDKN2A locus, LUSC samples")
 @
 
-\subsection{\texttt{SFpval}}
-\texttt{SFpval} allows you to obatin the $p$-value without creating any plots.  
+\subsection{\Rfunction{SFpval}}
+\Rfunction{SFpval} allows you to obatin the $p$-value without creating any plots.  
 
 <<>>=
 output <- SFpval(mdata)
 output@pvalnorm
 @
 
-This reported $p$-value may not perfectly match the $p$-value reported in the plots because the $p$-value calculation depends on simulation.  This function is useful if you are interested in testing hundreds or thousands of loci in the genome.  Once you have obtained all of the $p$-values, you can create plots for only the most significant genes.  Since \texttt{SFpval} does not correct for multiple comparisons, it is important to adjust the $p$-values using \texttt{p.adjust()} if iterating over multiple loci.
+This reported $p$-value may not perfectly match the $p$-value reported in the plots because the $p$-value calculation depends on simulation.  This function is useful if you are interested in testing hundreds or thousands of loci in the genome.  Once you have obtained all of the $p$-values, you can create plots for only the most significant genes.  Since \Rfunction{SFpval} does not correct for multiple comparisons, it is important to adjust the $p$-values using \Rfunction{p.adjust} if iterating over multiple loci.
 
-\subsection{\texttt{SFlabels} and \texttt{SFnormalize}}
-Cluster labels can be computed with \texttt{SFlabels}.  First, we have to normalize the data using \texttt{SFnormalize}.  Because we are interested in alterations such as splicing and fusions instead of differential gene expression, the \texttt{SigFuge} normalization procedure adjusts for differences in total expression (read counts).  The normalization procedure first filters out lowly expressed samples because these samples are unable to provide any evidence of an alteration.
+\subsection{\Rfunction{SFlabels} and \Rfunction{SFnormalize}}
+Cluster labels can be computed with \Rfunction{SFlabels}.  First, we have to normalize the data using \Rfunction{SFnormalize}.  Because we are interested in alterations such as splicing and fusions instead of differential gene expression, the \texttt{SigFuge} normalization procedure adjusts for differences in total expression (read counts).  The normalization procedure first filters out lowly expressed samples because these samples are unable to provide any evidence of an alteration.
 
 <<>>=
 norm <- SFnormalize(mdata)
