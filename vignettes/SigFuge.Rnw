@@ -21,7 +21,7 @@ BiocStyle::latex()
 \tableofcontents
 
 \section{Summary}
-\texttt{SigFuge} is a tool that takes as input RNA-seq read depth (coverage) for multiple samples across a genomic locus (gene/transcript) and (1) clusters samples using the coverage data, (2) assesses significance of the clusters using SigClust and (3) visualizes transcript coverage along genomic coordinates.  This document provides a tutorial on how to use the functions of the \Biocpkg{SigFuge} package. \textbf{THERE HAVE BEEN SEVERAL CRITICAL UPDATES TO THE SigFuge PACKAGE. MAKE SURE THAT YOU HAVE DOWNLOADED AND ARE RUNNING SigFuge VERSION 1.1.2 OR GREATER TO ACHIEVE ALL FUNCTIONALITY DESCRIBED IN THIS TUTORIAL.}
+\texttt{SigFuge} is a tool that takes as input RNA-seq read depth (coverage) for multiple samples across a genomic locus (gene/transcript) and (1) clusters samples using the coverage data, (2) assesses significance of the clusters using SigClust and (3) visualizes transcript coverage along genomic coordinates.  This document provides a tutorial on how to use the functions of the \Biocpkg{SigFuge} package.
 
 \section{Introduction}
 Frequently, one of the main goals of an RNA-seq experiment is to identify genes that are differentially expressed (DE) between two conditions, e.g. tumor and matched normal samples.  In this setting where the contrasting groups of samples are known, several existing DE tools, including Bioconductor packages \Biocpkg{DESeq}~\cite{DESeq} and \Biocpkg{edgeR}~\cite{edgeR}, can be used to identify the set of DE genes.
@@ -38,7 +38,7 @@ This tutorial is split into two parts.  The first part (Section 3) provides exam
 \subsection{Citation} 
 For a more in depth discussion of clustering per-base expression profiles, see our manuscript describing the \texttt{SigFuge} algorithm in further detail.  Please try to cite the following article when you publish results obtained using the software.
 \begin{quote}
-Kimes, P., Cabanski, C., Wilkerson, M., Johnson, A., Makowski, L., Maher, C., Liu, Y., Perou, C., Marron, J.S., Hayes, D.N. SigFuge: unsupervised exploration of transcriptional alterations in RNA-Seq data. \textit{In preparation}.
+Kimes, P.K., Cabanski, C.R., Wilkerson, M.D., Zhao, N., Johnson, A.R., Perou, C.M., Makowski, L., Maher, C., Liu, Y., Marron, J.S., Hayes, D.N. (2014) SigFuge: single gene clustering of RNA-seq reveals differential isoform usage among cancer samples. \textit{Nucleic Acids Research}, 42(14):e113.
 \end{quote}
 
 \section{Importing data}
@@ -110,14 +110,14 @@ calcInfo <- function(x) {
     info
 }
 
-param <- ApplyPileupsParam(which=geneAnnot, what=c("seq","qual"),
-                           yieldBy="position", yieldAll=TRUE)
+param <- PileupParam(which=geneAnnot, what=c("seq","qual"),
+                      yieldBy="position", yieldAll=TRUE)
 
 fls <- PileupFiles(bam_files, param=param)
 res <- applyPileups(fls, calcInfo, param=param)
 geneDepth <- t(do.call(cbind,res))
 colnames(geneDepth) <- c("Sample1", "Sample2")
-geneDepth[500:505,]
+geneDepth[500:505, ]
 @
 
 Depending on the number of samples, the above method may take several minutes per gene to create the coverage matrix.  
