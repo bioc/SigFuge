@@ -110,8 +110,8 @@ calcInfo <- function(x) {
     info
 }
 
-param <- PileupParam(which=geneAnnot, what=c("seq","qual"),
-                      yieldBy="position", yieldAll=TRUE)
+param <- ApplyPileupsParam(which=geneAnnot, what=c("seq", "qual"),
+                           yieldBy="position", yieldAll=TRUE)
 
 fls <- PileupFiles(bam_files, param=param)
 res <- applyPileups(fls, calcInfo, param=param)
