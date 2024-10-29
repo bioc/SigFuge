@@ -1,7 +1,7 @@
 Package: SigFuge
 Type: Package
 Title: SigFuge
-Version: 1.43.0
+Version: 1.44.0
 Date: 2021-11-21
 Author: Patrick Kimes, Christopher Cabanski
 Maintainer: Patrick Kimes <patrick.kimes@gmail.com>
