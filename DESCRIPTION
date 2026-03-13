@@ -1,7 +1,7 @@
 Package: SigFuge
 Type: Package
 Title: SigFuge
-Version: 1.49.0
+Version: 1.49.1
 Date: 2021-11-21
 Author: Patrick Kimes, Christopher Cabanski
 Maintainer: Patrick Kimes <patrick.kimes@gmail.com>
@@ -13,3 +13,4 @@ Depends: R (>= 3.1.1), GenomicRanges
 Suggests: org.Hs.eg.db, prebsdata, Rsamtools (>= 1.17.0),
         TxDb.Hsapiens.UCSC.hg19.knownGene, BiocStyle
 biocViews: Clustering, Visualization, RNASeq, ImmunoOncology
+PackageStatus: Deprecated
